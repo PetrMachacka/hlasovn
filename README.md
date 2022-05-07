@@ -13,6 +13,8 @@ Slouží k úpravě tohoto úložiště v aplikaci MakeCode.
 * hlasování vypnuto/zapnuto = button_A
 * přepínání hlasu = button_A/button_B
 * odeslání hlasu = pin_1
+* vynulování hlasů = button_B
+* zobrazit výsledky = logo_longpress
 
 ## Protokoly
 * hlasování vypnuto/zapnuto = enabled, 0/1

@@ -22,6 +22,22 @@ input.onLogoEvent(TouchButtonEvent.Pressed, function on_logo_event_pressed2() {
     
 })
 //  Starting
+input.onLogoEvent(TouchButtonEvent.LongPressed, function vysledky() {
+    let counter: number;
+    
+    if (start == 0) {
+        counter = 0
+        for (let i of _py.slice(data_list_serial, null, null, -1)) {
+            if (control_list.indexOf(i) < 0) {
+                control_list.push(i)
+                console.log(i + " " + data_list_vote[data_list_vote.length - (counter + 1)])
+            }
+            
+            counter += 1
+        }
+    }
+    
+})
 //  Send number
 input.onPinPressed(TouchPin.P1, function on_pin_pressed_p1() {
     if (role == "klient") {
@@ -39,8 +55,6 @@ radio.onReceivedValue(function on_received_value(name: string, value: number) {
             radio.sendValue("ack", serial_number)
             data_list_serial.push(serial_number)
             data_list_vote.push(String.fromCharCode(value + 64))
-            console.log(data_list_serial)
-            console.log(data_list_vote)
         }
         
     }
@@ -63,7 +77,6 @@ radio.onReceivedValue(function on_received_value(name: string, value: number) {
     
 })
 input.onButtonPressed(Button.A, function on_button_pressed_a() {
-    let counter: number;
     //  Start
     if (role == "klient") {
         
@@ -75,23 +88,10 @@ input.onButtonPressed(Button.A, function on_button_pressed_a() {
         
         if (start == 1) {
             start = 0
-            counter = 0
-            for (let i of _py.slice(data_list_serial, null, null, -1)) {
-                if (control_list.indexOf(i) < 0) {
-                    control_list.push(i)
-                    console.log(i + " " + data_list_vote[data_list_vote.length - (counter + 1)])
-                }
-                
-                counter += 1
-            }
-            data_list_serial = [0]
-            data_list_vote = ["nothing"]
-            control_list = [0]
         } else {
             start = 1
         }
         
-        console.log(start)
         radio.sendValue("enabled", start)
     }
     
@@ -102,6 +102,12 @@ input.onButtonPressed(Button.B, function on_button_pressed_b() {
         cislo = Math.constrain(cislo, 1, 25)
         cislo += 1
         basic.showString(String.fromCharCode(cislo + 64))
+    } else {
+        //  Nulovani
+        
+        data_list_serial = [0]
+        data_list_vote = ["nothing"]
+        control_list = [0]
     }
     
 })

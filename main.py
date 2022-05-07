@@ -29,21 +29,9 @@ def on_button_pressed_a():
         basic.show_string(String.from_char_code(cislo + 64))
     #End
     else:
-        global start, control_list, data_list_serial, data_list_vote
-        if start == 1:
-            start = 0
-            counter = 0
-            
-            for i in data_list_serial[::-1]:
-                if i not in control_list:
-                    control_list.append(i)
-                    print(i + " " + data_list_vote[len(data_list_vote)-(counter+1)])
-                counter += 1
-            data_list_serial = [0]
-            data_list_vote = ["nothing"]
-            control_list = [0]
+        global start
+        if start == 1:start = 0
         else: start = 1
-        print(start)
         radio.send_value("enabled", start)
 def on_button_pressed_b():
     if role == "klient":
@@ -51,6 +39,22 @@ def on_button_pressed_b():
         cislo = Math.constrain(cislo, 1, 25)
         cislo += 1
         basic.show_string(String.from_char_code(cislo + 64))
+    else:
+        # Nulovani
+        global control_list, data_list_serial, data_list_vote
+        data_list_serial = [0]
+        data_list_vote = ["nothing"]
+        control_list = [0]
+def vysledky():
+    global control_list, data_list_serial, data_list_vote
+    if start == 0:
+        counter = 0
+        for i in data_list_serial[::-1]:
+            if i not in control_list:
+                control_list.append(i)
+                print(i + " " + data_list_vote[len(data_list_vote)-(counter+1)])
+            counter += 1
+input.on_logo_event(TouchButtonEvent.LONG_PRESSED, vysledky)
 # Send number
 def on_pin_pressed_p1():
     if role == "klient":
@@ -66,8 +70,6 @@ def on_received_value(name, value):
             radio.send_value("ack", serial_number)
             data_list_serial.append(serial_number)
             data_list_vote.append(String.from_char_code(value + 64))
-            print(data_list_serial)
-            print(data_list_vote)
     if role == "klient":
         if name == "ack" and value == control.device_serial_number():
                 music.play_tone(Note.C, 300)
