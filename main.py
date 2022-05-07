@@ -29,10 +29,11 @@ def on_button_pressed_a():
         basic.show_string(String.from_char_code(cislo + 64))
     #End
     else:
-        global start, control_list, data_list_vote, data_list_serial
+        global start, control_list, data_list_serial, data_list_vote
         if start == 1:
             start = 0
             counter = 0
+            
             for i in data_list_serial[::-1]:
                 if i not in control_list:
                     control_list.append(i)
