@@ -8,3 +8,11 @@ Slouží k úpravě tohoto úložiště v aplikaci MakeCode.
 * klikněte na možnost **Import** a poté na **Import adresy URL**
 * vložte **https://github.com/petrmachacka/hlasovn** a klikněte na možnost import
 ## Ovládání
+* přepínač serveru a klienta = krátké zmáčknutí loga
+* hlasování vypnuto/zapnuto = button_A
+* přepínání hlasu = button_A/button_B
+* odeslání hlasu = pin_1
+## Protokoly
+* hlasování vypnuto/zapnuto = enabled, 0/1
+* potvrzení hlasu = ack, seriové číslo
+* poslání hlasu = vote, 65 > cislo <

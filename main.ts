@@ -1,11 +1,12 @@
-pins.touchSetMode(TouchTarget.P0, TouchTargetMode.Capacitive)
+pins.touchSetMode(TouchTarget.P1, TouchTargetMode.Capacitive)
 radio.setGroup(69)
 radio.setTransmitPower(7)
 radio.setTransmitSerialNumber(true)
 let start = 0
 let cislo = 1
-let data_list = [[0], [0]]
-let myserial = []
+let data_list_serial = [0]
+let data_list_vote = ["nothing"]
+let control_list = [0]
 let role = "klient"
 basic.showString("K")
 //  Role changing
@@ -20,54 +21,36 @@ input.onLogoEvent(TouchButtonEvent.Pressed, function on_logo_event_pressed2() {
     }
     
 })
-//  Klient
-//  Moving
+//  Starting
 //  Send number
 input.onPinPressed(TouchPin.P1, function on_pin_pressed_p1() {
     if (role == "klient") {
-        radio.sendValue("key", cislo)
+        radio.sendValue("vote", cislo)
     }
     
 })
-function on_received_value_klient(name: any, value: any) {
-    if (role == "klient") {
-        if (name == "acr") {
-            music.playTone(Note.C, 300)
-        }
-        
-    }
+//  Receive
+radio.onReceivedValue(function on_received_value(name: string, value: number) {
     
-    if (name == "vote") {
-        if (value == 1) {
-            basic.showIcon(IconNames.Yes)
-        } else {
-            basic.showIcon(IconNames.No)
-        }
-        
-    }
-    
-}
-
-radio.onReceivedValue(on_received_value)
-//  Server
-function on_received_value(name: string, value: number) {
     let serial_number = radio.receivedPacket(RadioPacketProperty.SerialNumber)
-    
     if (role == "server") {
-        if (start == 1 && name == "key") {
+        if (start == 1 && name == "vote") {
             music.playTone(Note.C, 200)
-            console.log(String.fromCharCode(value + 64))
-            radio.sendValue("acr", serial_number)
+            radio.sendValue("ack", serial_number)
+            data_list_serial.push(serial_number)
+            data_list_vote.push(String.fromCharCode(value + 64))
+            console.log(data_list_serial)
+            console.log(data_list_vote)
         }
         
     }
     
     if (role == "klient") {
-        if (name == "acr" && value == control.deviceSerialNumber()) {
+        if (name == "ack" && value == control.deviceSerialNumber()) {
             music.playTone(Note.C, 300)
         }
         
-        if (name == "vote") {
+        if (name == "enabled") {
             if (value == 1) {
                 basic.showIcon(IconNames.Yes)
             } else {
@@ -78,32 +61,45 @@ function on_received_value(name: string, value: number) {
         
     }
     
-}
-
-radio.onReceivedValue(on_received_value)
+})
 input.onButtonPressed(Button.A, function on_button_pressed_a() {
+    let counter: number;
+    //  Start
     if (role == "klient") {
         
-        cislo = Math.constrain(cislo, 2, 5)
+        cislo = Math.constrain(cislo, 2, 26)
         cislo -= 1
         basic.showString(String.fromCharCode(cislo + 64))
     } else {
+        // End
         
         if (start == 1) {
             start = 0
+            counter = 0
+            for (let i of _py.slice(data_list_serial, null, null, -1)) {
+                if (control_list.indexOf(i) < 0) {
+                    control_list.push(i)
+                    console.log(i + " " + data_list_vote[data_list_vote.length - (counter + 1)])
+                }
+                
+                counter += 1
+            }
+            data_list_serial = [0]
+            data_list_vote = ["nothing"]
+            control_list = [0]
         } else {
             start = 1
         }
         
         console.log(start)
-        radio.sendValue("vote", start)
+        radio.sendValue("enabled", start)
     }
     
 })
 input.onButtonPressed(Button.B, function on_button_pressed_b() {
     if (role == "klient") {
         
-        cislo = Math.constrain(cislo, 2, 5)
+        cislo = Math.constrain(cislo, 1, 25)
         cislo += 1
         basic.showString(String.fromCharCode(cislo + 64))
     }
